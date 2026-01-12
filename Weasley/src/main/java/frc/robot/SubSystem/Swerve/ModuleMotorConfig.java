@@ -1,5 +1,6 @@
 package frc.robot.SubSystem.Swerve;
 
+import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -20,7 +21,7 @@ public class ModuleMotorConfig {
         public static SparkMaxConfig driveMotorConfig = new SparkMaxConfig();
         public static SparkMaxConfig turnMotorConfig = new SparkMaxConfig();
 
-    public static void configureTurnMotor(SparkMax motor) {
+    public static void configureTurnMotor(SparkMax motor) { 
          //turn config
          turnMotorConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)//FeedbackSensor.kPrimaryEncoder
          .p(TURN_P)
