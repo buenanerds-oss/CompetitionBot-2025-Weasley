@@ -1,0 +1,26 @@
+the NerdLog class intended to be stolen and reused
+    this generally recomended when you don't want/know how to use advantagekit.
+    NerdLog class is compatable with advantageScope
+
+initialize() {
+    starts the class
+    ALWAYS place in robot constructor, but after everything that contains everything that has a variation of logVariable()
+}
+
+periodic() {
+    run in robot periodic
+}
+
+there may be multiple methods of the variation of:
+
+addVariableToLog() {
+    required in order to log  a variable
+}
+
+logVariable(var variable) {
+    will run variable into the logs and also the networktables 
+}
+
+using annotations {
+    
+}
