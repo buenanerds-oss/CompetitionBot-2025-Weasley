@@ -1,5 +1,6 @@
 package frc.robot.SubSystem.Swerve;
 
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkMax;
@@ -7,7 +8,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class ModuleMotorConfig {
-    public static double TURN_P = 0.00;
+    public static double TURN_P = 0.2;
     public static double TURN_I = 0.00;
     public static double TURN_D = 0.00;
 
@@ -73,7 +74,7 @@ public class ModuleMotorConfig {
         .uvwMeasurementPeriod(10)
         .uvwAverageDepth(2);
 
-        motor.configure(driveMotorConfig, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        motor.configure(driveMotorConfig, ResetMode.kResetSafeParameters, com.revrobotics.PersistMode.kPersistParameters);
 
     }
 
