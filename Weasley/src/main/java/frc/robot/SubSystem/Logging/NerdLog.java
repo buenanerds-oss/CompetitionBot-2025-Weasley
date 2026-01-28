@@ -20,6 +20,7 @@ public class NerdLog {
     static HashMap<String, DoublePublisher> doublePublishers;
     static HashMap<String, DoubleArrayPublisher> doubleArrayPublishers;
     static HashMap<String, StructArrayPublisher> structArrayPublishers;
+    static NetworkTableInstance tableInst;
 
 
     /**
@@ -43,11 +44,12 @@ public class NerdLog {
         DataLogManager.start(directory, fileName);
         DriverStation.startDataLog(DataLogManager.getLog());
 
-        NetworkTableInstance tableInst = NetworkTableInstance.getDefault();
+        tableInst = NetworkTableInstance.getDefault();
         baseTable = tableInst.getTable("Robot");
         structPublishers = new HashMap<>();
         doublePublishers = new HashMap<>();
         doubleArrayPublishers = new HashMap<>();
+        structArrayPublishers = new HashMap<>();
     }
 
     //uses reflection and reflection scares me...

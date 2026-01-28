@@ -30,6 +30,8 @@ public class SwerveConstants {
     public static final Translation2d[] moduletranslations = {new Translation2d(driveLength/2, driveWidth/2), new Translation2d(driveLength/2, -driveWidth/2),
         new Translation2d(-driveLength/2, driveWidth/2), new Translation2d(-driveLength/2, -driveWidth/2)};
     public static final double mass_KG = 45.3592;
+    public static final double MomentOfInertia = 0.00;
+    public static final int GyroCANID = 10;
 
 
 }

@@ -19,4 +19,30 @@ public interface ControllerIO {
      * @return
      */
     public default double getDriveTwist() { return 0.0;}
-}
+
+    /**
+     * 
+     * @return 1.00 if increase, 0.00 if nothing, -1.00 if decrease
+     */
+   public default double getPIDPChange() {
+    return 0.0;
+    }
+
+     /**
+     * 
+     * @return 1.00 if increase, 0.00 if nothing, -1.00 if decrease
+     */
+   public default double getPIDIAxis() {
+    return 0.0;
+    }
+
+     /**
+     * 
+     * @return 1.00 if increase, 0.00 if nothing, -1.00 if decrease
+     */
+   public default double getPIDDChange() {
+    return 0.0;
+    }
+
+   
+   }

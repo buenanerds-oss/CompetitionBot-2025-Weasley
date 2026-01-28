@@ -25,10 +25,11 @@ public class Drive implements Subsystem {
      * @param gyro - the Gyro your using
      * @param modules - modules in the order of FL, FR, BL, BR
      */
-    public Drive(GyroIO gyro, ModuleIO... modules) {
+    public Drive(GyroIO gyro, ModuleIO[] modules) {
         this.modules = modules;
         this.gyro = gyro;
-        poseEstimator = new SwerveDrivePoseEstimator(swerveKino, new Rotation2d(gyro.getAngleRad()), new SwerveModulePosition[4], SwerveConstants.initialPose);
+        SwerveModulePosition[] newPos = {new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()};
+        poseEstimator = new SwerveDrivePoseEstimator(swerveKino, new Rotation2d(gyro.getAngleRad()), newPos, SwerveConstants.initialPose);
         currentChassis = new ChassisSpeeds();
 
 
@@ -73,5 +74,9 @@ public class Drive implements Subsystem {
         NerdLog.logDouble(" Module Turn PID D",  Robot.isReal()? ModuleMotorConfig.TURN_D : ModuleMotorConfig.SIM_TURN_D);
         
         for (ModuleIO module : modules) module.periodic();
+    }
+
+    public void changePID(String value, double incrementAmount) {
+        for (ModuleIO module : modules) module.changeModuleTurnPID(value, incrementAmount);
     }
 }

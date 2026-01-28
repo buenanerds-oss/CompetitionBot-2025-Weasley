@@ -9,6 +9,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import frc.robot.SubSystem.Logging.GroupLogger;
+import frc.robot.SubSystem.Logging.NerdLog;
 import frc.robot.Util.BasicUtil;
 
 public class Module extends ModuleMotorConfig implements ModuleIO {
@@ -66,12 +67,12 @@ public class Module extends ModuleMotorConfig implements ModuleIO {
         //turning
         //if we are not at the position AND we aren't in emergencyStop, keep running PID.
         if (!BasicUtil.numIsInBallparkOf(currentSwerveState.angle.getRadians(), desiredState.angle.getRadians(), SwerveConstants.turnAccuracyToleranceRAD) && !EmergencyStop) {
-            turnController.setReference(Units.radiansToRotations(desiredState.angle.getRadians()), ControlType.kPosition);
+            turnController.setSetpoint(Units.radiansToRotations(desiredState.angle.getRadians()), ControlType.kPosition);
         }
         else turnMotor.setVoltage(0); // if we don't need it to move, stop giving it the voltage to move
 
 
-        
+        /*
         //drive
         //the equation in the getter of the velocity converts from RPM to RADPM to MPS
         if (!BasicUtil.numIsInBallparkOf(currentSwerveState.speedMetersPerSecond, desiredState.speedMetersPerSecond, SwerveConstants.driveAccuracyToleranceMPS) && !EmergencyStop && !BasicUtil.numIsInBallparkOf(desiredState.speedMetersPerSecond, 0, SwerveConstants.driveAccuracyToleranceMPS)) {
@@ -82,6 +83,7 @@ public class Module extends ModuleMotorConfig implements ModuleIO {
         }
         else driveMotor.setVoltage(0); //hard stop it in emergency mode
 
+        */
         //record changes
 
         turnAmps = turnMotor.getOutputCurrent();
@@ -118,8 +120,9 @@ public class Module extends ModuleMotorConfig implements ModuleIO {
         GroupLogger.logStructGroup("Swerve Module States", currentSwerveState, SwerveModuleState.struct, index, 4);
         GroupLogger.logDoubleGroup("Swerve Module Turn Amps", turnAmps, index, 4);
         GroupLogger.logDoubleGroup("Swerve Module Turn volts", turnVolts, index, 4);
-        GroupLogger.logDoubleGroup("Swerve Module Turn Amps", driveAmps, index, 4);
-        GroupLogger.logDoubleGroup("Swerve Module Turn Amps", driveVolts, index, 4);
+        GroupLogger.logDoubleGroup("Swerve Module drive Amps", driveAmps, index, 4);
+        GroupLogger.logDoubleGroup("Swerve Module drive Volts", driveVolts, index, 4);
+        
 
     }
 
