@@ -2,10 +2,13 @@ package frc.robot.SubSystem.Logging;
 
 import java.util.HashMap;
 
+import edu.wpi.first.networktables.BooleanArrayPublisher;
+import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.util.struct.Struct;
@@ -20,6 +23,8 @@ public class NerdLog {
     static HashMap<String, DoublePublisher> doublePublishers;
     static HashMap<String, DoubleArrayPublisher> doubleArrayPublishers;
     static HashMap<String, StructArrayPublisher> structArrayPublishers;
+    static HashMap<String, BooleanPublisher> booleanPublishers;
+    static HashMap<String, BooleanArrayPublisher> boolArrayPublishers;
     static NetworkTableInstance tableInst;
 
 
@@ -50,6 +55,8 @@ public class NerdLog {
         doublePublishers = new HashMap<>();
         doubleArrayPublishers = new HashMap<>();
         structArrayPublishers = new HashMap<>();
+        booleanPublishers = new HashMap<>();
+        boolArrayPublishers = new HashMap<>();
     }
 
     //uses reflection and reflection scares me...
@@ -96,6 +103,26 @@ public class NerdLog {
 
         DoubleArrayPublisher dubPub = doubleArrayPublishers.get(name);
         dubPub.set(variable);
+    }
+
+    public static void logBooleanVariable(String name, boolean variable) {
+        if (!booleanPublishers.containsKey(name)) {
+            BooleanPublisher boolPub = baseTable.getBooleanTopic(name).publish();
+            booleanPublishers.put(name, boolPub);
+        }
+
+        BooleanPublisher boolPub = booleanPublishers.get(name);
+        boolPub.set(variable);
+    }
+
+    public static void logBooleanArray(String name, boolean[] variables) {
+        if (!boolArrayPublishers.containsKey(name)) {
+            BooleanArrayPublisher boolArrPub= baseTable.getBooleanArrayTopic(name).publish();
+            boolArrayPublishers.put(name, boolArrPub);
+        }
+
+        BooleanArrayPublisher boolArrPub = boolArrayPublishers.get(name);
+        boolArrPub.set(variables);
     }
 
     }

@@ -8,7 +8,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class ModuleMotorConfig {
-    public static double TURN_P = 0.2;
+    public static double TURN_P = 0.175;
     public static double TURN_I = 0.00;
     public static double TURN_D = 0.00;
 
@@ -47,7 +47,7 @@ public class ModuleMotorConfig {
          .uvwMeasurementPeriod(10)
          .uvwAverageDepth(2);
 
-         motor.configure(driveMotorConfig, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+         motor.configure(turnMotorConfig, ResetMode.kResetSafeParameters, com.revrobotics.PersistMode.kPersistParameters);
 
     }
 
@@ -83,7 +83,7 @@ public class ModuleMotorConfig {
      * @param valueToChange - P, I, D, only. no Variation allowed either
      * @param IncrementAmount - set negative to reduce value, set 0 for no changes
      */
-    public static void changeTurnPID(String valueToChange, double IncrementAmount, SparkMax motor) {
+    public static void changeTurnPID(String valueToChange, double IncrementAmount) {
         switch (valueToChange) {
             case "P":
                 TURN_P += IncrementAmount;
@@ -103,8 +103,6 @@ public class ModuleMotorConfig {
             default:
             return;
         }
-
-        motor.configure(turnMotorConfig, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         
 
     }
@@ -114,20 +112,38 @@ public class ModuleMotorConfig {
      * @param valueToChange - P, I, D, only. no Variation allowed either
      * @param IncrementAmount - set negative to reduce value
      */
-    public static void changeDrivePID(String valueToChange, double IncrementAmount, SparkMax motor) {
+    public static void changeDrivePID(String valueToChange, double IncrementAmount) {
         switch (valueToChange) {
             case "P":
                 DRIVE_P += IncrementAmount;
-                driveMotorConfig.closedLoop.p(TURN_P);
                 break;
             case "I":
                 DRIVE_I += IncrementAmount;
-                driveMotorConfig.closedLoop.i(TURN_I);
 
                 break;
             case "D":
                 DRIVE_D += IncrementAmount;
-                driveMotorConfig.closedLoop.d(TURN_D);
+
+                break;
+        
+            default:
+            return;
+        }
+    }
+
+    //simulated PID values, Thats all sim needs from this class:
+
+    public static void changeDriveSimPID(String valueToChange, double IncrementAmount) {
+        switch (valueToChange) {
+            case "P":
+                SIM_DRIVE_P += IncrementAmount;
+                break;
+            case "I":
+                SIM_DRIVE_I += IncrementAmount;
+
+                break;
+            case "D":
+                SIM_DRIVE_D += IncrementAmount;
 
                 break;
         
@@ -135,12 +151,29 @@ public class ModuleMotorConfig {
             return;
         }
 
-        motor.configure(driveMotorConfig, com.revrobotics.spark.SparkBase.ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
-    //simulated PID values, Thats all sim needs from this class:
+    public static void changeTurnSimPID(String valueToChange, double IncrementAmount) {
+        switch (valueToChange) {
+            case "P":
+                SIM_TURN_P += IncrementAmount;
+                break;
+            case "I":
+                SIM_TURN_I += IncrementAmount;
 
-    public static double SIM_DRIVE_P = 0.0;
+                break;
+            case "D":
+                SIM_TURN_D += IncrementAmount;
+
+                break;
+        
+            default:
+            return;
+        }
+
+    }
+
+    public static double SIM_DRIVE_P = 0.1;
     public static double SIM_DRIVE_I = 0.0;
     public static double SIM_DRIVE_D = 0.0;
     public static double SIM_TURN_P = 0.0;
