@@ -1,5 +1,11 @@
 package frc.robot.SubSystem.Swerve;
 
+import java.util.Optional;
+
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+
+import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
+
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
@@ -41,6 +47,10 @@ public interface ModuleIO{
 
     public default SwerveModulePosition getmodulePosition(){
         return new SwerveModulePosition();
+    }
+
+    public default Optional<SwerveDriveSimulation> getSwerveSim() {
+        return Optional.empty();
     }
 
     

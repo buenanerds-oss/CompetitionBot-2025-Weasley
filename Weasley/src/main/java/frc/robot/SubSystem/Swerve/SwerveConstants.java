@@ -12,9 +12,9 @@ public class SwerveConstants {
 
     //turn motor
     public static final double turnGearRatio = 8.75;
-    public static final double turnMaxAmps = 1;
+    public static final double turnMaxAmps = 5;
     public static final double turnMaxVolts = 1;
-    public static final double turnAccuracyToleranceRAD = Units.degreesToRadians(5);
+    public static final double turnAccuracyToleranceRAD = Units.degreesToRadians(1);
 
     //drive motor
     public static final double driveGearRatio = 1;

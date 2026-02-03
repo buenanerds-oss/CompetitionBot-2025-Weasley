@@ -4,14 +4,11 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj.drive.RobotDriveBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Commands.DriveCommand;
 import frc.robot.SubSystem.Controllers.ControllerIO;
-import frc.robot.SubSystem.Controllers.JoystickIO;
+import frc.robot.SubSystem.Controllers.XboxControllerIO;
 import frc.robot.SubSystem.Logging.GroupLogger;
 import frc.robot.SubSystem.Logging.NerdLog;
 import frc.robot.SubSystem.Swerve.Drive;
@@ -23,12 +20,17 @@ import frc.robot.SubSystem.Swerve.Gyro.GyroSim;
 import frc.robot.SubSystem.Swerve.Gyro.Pidgeon2IO;
 
 public class RobotContainer {
-  ControllerIO controller = new JoystickIO(0);
+  //ControllerIO controller = new JoystickIO(0);
+  ControllerIO Controller = new XboxControllerIO(0);
 
   final double driveSpeedFactor = 1;
+  String[] PIDModes = {"P", "I", "D"};
+  int PIDModeSelection = 0;
 
 
   Drive swerve;
+  DriveCommand driveCmd;
+
   public RobotContainer() {
     NerdLog.startLog();
     GroupLogger.startGroupLogger();
@@ -37,37 +39,55 @@ public class RobotContainer {
     GyroIO gyro;
     if (Robot.isReal()) {
       for (int i = 0; i <= 3; i++) {
-        modules[i] = new Module(i, AllMotors.SwerveTurnMotors[i], AllMotors.SwerveDriveMotors[i]);
+        modules[i] = new Module(i, RobotMap.SwerveTurnMotors[i], RobotMap.SwerveDriveMotors[i]);
       }
       gyro = new Pidgeon2IO();
     }
     else {
       for (int i = 0; i<=3; i++) {
-        modules[i] = new ModuleSIm();
+        modules[i] = new ModuleSIm(i);
       }
-      gyro = new GyroSim();
+      if (modules[0].getSwerveSim().isPresent()) gyro = new GyroSim(modules[0].getSwerveSim().get().getGyroSimulation());
+      else gyro = new GyroSim();
     }
     
     swerve = new Drive(gyro, modules);
+    driveCmd = new DriveCommand();
+
+    configureControls();
 
   }
 
   
 
-  public void doTheDrivingThing() {
-    swerve.move(controller.getDriveX(), controller.getDriveY(), controller.getDriveTwist());
-    
-  }
-
   public void roboPeriodic() {
     swerve.periodic();
+    NerdLog.logDouble("PID Mode Selection", PIDModeSelection);
   }
 
   public void disabledPeriodic() {
-    if (Math.abs(controller.getPIDPChange()) > 0 || Math.abs(controller.getPIDDChange()) > 0) {
-      swerve.changePID("P", controller.getPIDPChange());
-      swerve.changePID("D", controller.getPIDDChange());
-    }
+
+    //PID changing
+   Controller.getPIDIncrease().onTrue(driveCmd.ChangePID(swerve, PIDModes[PIDModeSelection], true));
+   Controller.getPIDDecrease().onTrue(driveCmd.ChangePID(swerve, PIDModes[PIDModeSelection], false));
+
+   //PID Mode switching
+   Controller.getPIDSwitchPositive().onTrue(Commands.runOnce( () -> {
+    if (PIDModeSelection < PIDModes.length) PIDModeSelection++;
+    else PIDModeSelection = 0;
+   }));
+   Controller.getPIDSwitchNegative().onTrue(Commands.runOnce(() -> {
+    if (PIDModeSelection >= 0) PIDModeSelection--;
+    else PIDModeSelection = 3;
+   }));
+
+  }
+
+  private void configureControls() {
+    swerve.setDefaultCommand(driveCmd.JoystickDrive(swerve, Controller.getDriveX() * driveSpeedFactor,
+    Controller.getDriveY() *  driveSpeedFactor, 
+    Controller.getDriveTwist() * driveSpeedFactor));
+    
   }
 
 
