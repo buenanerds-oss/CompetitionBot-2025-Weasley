@@ -4,10 +4,21 @@ package frc.robot;
 import java.util.List;
 import java.util.Optional;
 
+import org.dyn4j.geometry.Transform;
+import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonTrackedTarget;
+import org.photonvision.utils.*;
 
+import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.SubSystem.Climb.Climb;
 import frc.robot.SubSystem.Climb.ClimbIO;
@@ -17,6 +28,11 @@ import frc.robot.SubSystem.Vision.Vision;
 import frc.robot.SubSystem.Vision.VisionIO;
 
 public class AutoPicker {
+    private static PIDController driveXPID = new PIDController(0, 0, 0);
+    private static PIDController driveYPID = new PIDController(0, 0, 0);
+    private static ProfiledPIDController driveThetaPID = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0));
+    private static double desiredVelocityMetersPerSec =1;
+    private static HolonomicDriveController driveControls = new HolonomicDriveController(driveXPID, driveYPID, driveThetaPID);
     
 
     private static Drive drive;
@@ -24,6 +40,7 @@ public class AutoPicker {
     private static ClimbIO climb;
     private static VisionIO vision;
     private static ChassisSpeeds DesiredChassisSpeeds;
+    private static Transform3d[] robotToCamera; 
 
     /**
      *  do this is the robotContainer
@@ -32,7 +49,7 @@ public class AutoPicker {
      * @param climb
      * @param vision
      */
-    public static void SupplySubSystems(Drive drive, FuelControl fuelCrtl, ClimbIO climb, VisionIO vision) {
+    public static void SupplySubSystems(Drive drive, FuelControl fuelCrtl, ClimbIO climb, VisionIO vision, Transform3d[] robotToCamera) {
     }
 
     public static enum AutoRoutines {
@@ -49,8 +66,49 @@ public class AutoPicker {
         }
 
     }
+    /**
+     * for tuning the forward pid controller, forward 1 meter
+     */
+    public static void forwardTuningTest(Pose2d initialPose){
+        DesiredChassisSpeeds = driveControls.calculate(initialPose, 
+            new Pose2d(initialPose.getX() +1,initialPose.getY(),initialPose.getRotation()),
+            desiredVelocityMetersPerSec, 
+            new Rotation2d());
+    }
 
-    /** shoot only */
+    /**
+     * for tuning sideways pid controller, left 1 meter
+     */
+    public static void sidewaysTuningTest(Pose2d initialPose) {
+        DesiredChassisSpeeds = driveControls.calculate(initialPose, 
+            new Pose2d(initialPose.getX(),initialPose.getY() + 1,initialPose.getRotation()),
+            desiredVelocityMetersPerSec, 
+            new Rotation2d());
+    }
+
+    /**
+     *  for tuning rotation , does 180
+     * @param initialPose
+     */
+    public static void rotationTuningTest(Pose2d initialPose) {
+        DesiredChassisSpeeds = driveControls.calculate(initialPose, 
+            new Pose2d(initialPose.getX(),initialPose.getY(),initialPose.getRotation().plus(new Rotation2d(Math.PI))), // does a 180
+            desiredVelocityMetersPerSec, 
+            new Rotation2d());
+    }
+
+    public static void defaultSpinBehavior() {
+        boolean foundTarget = false;
+        while (!foundTarget){
+            for (Optional<List<PhotonTrackedTarget>> targetsPerCam : vision.getTargets()) {
+                if (!targetsPerCam.isEmpty()) {
+                    foundTarget = true; break;
+                }
+            }
+        }
+           
+    }
+    /** shot only */
     private static void ShootBalls() {
         
     }
@@ -71,11 +129,11 @@ public class AutoPicker {
             //move closer to setpoint:
             Optional<ChassisSpeeds> desiredChassis = Optional.empty();
             Optional<List<PhotonTrackedTarget>>[] targetsOptional = vision.getTargets() ;
-            for (Optional<List<PhotonTrackedTarget>> optionalTargetPerCam : targetsOptional) {
-                if (optionalTargetPerCam.isEmpty()) continue;
+            for (int i = 0; i < targetsOptional.length; i++) {
+                if (targetsOptional[i].isEmpty()) continue;
 
                 double maxAmbiguity = 1.1; // slightly heigher than pose ambig max from method
-                for (PhotonTrackedTarget target : optionalTargetPerCam.get()) {
+                for (PhotonTrackedTarget target : targetsOptional[i].get()) {
                     if (target.getPoseAmbiguity() > 0.2) continue; // we don't accept ambigous targets here
 
                     //filter for climb AprilTags
@@ -83,9 +141,26 @@ public class AutoPicker {
                      && target.getPoseAmbiguity() < maxAmbiguity) {
 
                         maxAmbiguity = target.getPoseAmbiguity();
+                        
+                        //find targets global Pose:
+                        double distancefromTarget = PhotonUtils.calculateDistanceToTargetMeters(robotToCamera[i].getZ(), // camera height
+                            21.75, // of apriltags on climb rack per game manual
+                            robotToCamera[i].getRotation().getY(),
+                            target.getPitch());
 
-                        //
-                        desiredChassis = Optional.of(new ChassisSpeeds(0,0,0));
+                        double globalTargetAngleDeg = 0.00;
+                        
+
+                        //all robot-relative;
+                        double forwardspeed = distancefromTarget * Math.cos(target.getYaw());
+                        double sidewaysSpeed = distancefromTarget * Math.sin(target.getYaw());
+                        double rotation = target.getYaw();
+
+                        //i forgor that the chassis speeds can transform robot relatve to field-relative speciic
+                        desiredChassis = Optional.of(ChassisSpeeds.fromRobotRelativeSpeeds(new ChassisSpeeds(forwardspeed,sidewaysSpeed,rotation),
+                            drive.getEstimatedPose().getRotation()));
+                        
+                        
                     }
                 }
             }
@@ -115,9 +190,5 @@ public class AutoPicker {
 
     private static ChassisSpeeds getDesiredChassisSpeeds() {
         return DesiredChassisSpeeds;
-    }
-
-    private double scaleDistanceWithControls(double distance) {
-        return 0.0;
     }
 }
