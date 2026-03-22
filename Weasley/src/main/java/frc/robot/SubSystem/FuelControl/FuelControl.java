@@ -9,14 +9,14 @@ import frc.robot.SubSystem.FuelControl.Hopper.Hopper;
 import frc.robot.SubSystem.FuelControl.Hopper.HopperIO;
 import frc.robot.SubSystem.FuelControl.Shooter.Shooter;
 import frc.robot.SubSystem.FuelControl.Shooter.ShooterIO;
+import frc.robot.SubSystem.Logging.NerdLog;
 import edu.wpi.first.wpilibj.Timer;
 
 public class FuelControl{
     
     //for adjusting:
-    ShuffleboardTab fuelTab;
-    double hopperOutEnabledTimeSec = 0;
-    double hopperOutDisabledTimeSec= 0;
+    double hopperOutEnabledTimeSec = 1;
+    double hopperOutDisabledTimeSec= 1;
 
     //logging:
     
@@ -27,9 +27,11 @@ public class FuelControl{
     boolean hopperOutEnabled = false;;
 
     public FuelControl(SparkMax shootermotor, SparkMax hopperMotor) {
-        fuelTab = Shuffleboard.getTab("Fuel Management");
-        this.hopper = new Hopper(hopperMotor, fuelTab);
-        this.shooter = new Shooter(hopperMotor, fuelTab);
+        this.hopper = new Hopper(hopperMotor);
+        this.shooter = new Shooter(hopperMotor);
+
+        NerdLog.logDouble("Fuel Management/ Hopper out enabled timer", hopperOutDisabledTimeSec);
+        NerdLog.logDouble("Fuel Management/ Hopper out disnabled timer", hopperOutDisabledTimeSec);
     }
 
     public void startShooter() {
@@ -69,10 +71,13 @@ public class FuelControl{
         shooter.periodic();
         hopper.periodic();
 
-         if (hopperOutTimer.hasElapsed(3)) { // 3 is arbitrary, but i doubt we'd run either of the times for more than 2 secs
+         if (hopperOutTimer.hasElapsed(3)) { // 3 is arbitrary, but i doubt we'd run either of the hopper out times for more than 2 secs
             hopperOutTimer.stop();
             hopperOutTimer.reset();
         }
+
+        hopperOutEnabledTimeSec = NerdLog.getdouble("Fuel Management/ Hopper out enabled timer");
+        hopperOutDisabledTimeSec =  NerdLog.getdouble("Fuel Management/ Hopper out disnabled timer");
     }
 
     

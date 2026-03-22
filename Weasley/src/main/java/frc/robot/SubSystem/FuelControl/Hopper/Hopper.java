@@ -9,44 +9,64 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.SubSystem.Logging.NerdLog;
 
 public class Hopper implements HopperIO{
 
-    //for Shuffleboard:
+    //for adjusting:
     
-    ShuffleboardTab tab;
     double requestedVoltage;
-
-    //ShuffleBoard Entries:
+    double requestedSpeed;
 
     //logging:
+    double velocityRadPerSec;
 
     //functionals:
     SparkMax motor;
     RelativeEncoder encoder;
-    public Hopper(SparkMax motor, ShuffleboardTab tab) {
+    BangBangController speedControl;
+
+    public Hopper(SparkMax motor) {
         this.motor = motor;
-        this.tab = tab;
         configureMotor(false);
         this.encoder = motor.getEncoder();
+        speedControl = new BangBangController();
+        
+        velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
+
+        speedControl.setSetpoint(requestedSpeed);
+
+        NerdLog.logDouble("Fuel Management/ Hopper/ Requested Speed", requestedSpeed);
+        NerdLog.logDouble("Fuel Management/ Hopper/ Requested Voltage", requestedSpeed);
     }
 
     @Override
     public void hopperin() {
-        motor.setVoltage(requestedVoltage);
+        motor.setVoltage(requestedVoltage * speedControl.calculate(velocityRadPerSec));
     }
 
     @Override
     public void hopperOut() {
-        motor.set(-requestedVoltage);
+        motor.set(-requestedVoltage * speedControl.calculate(velocityRadPerSec));
     }
 
     @Override
     public void periodic() {
-        NerdLog.logDouble("Fuel Control/Hopper/ Hopper Velocity RadPerSec", Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity()));
+
+        velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
+
+        NerdLog.logDouble("Fuel Control/Hopper/ Hopper Velocity RadPerSec", Units.rotationsPerMinuteToRadiansPerSecond(velocityRadPerSec));
+
+
+        requestedSpeed = NerdLog.getdouble("Fuel Management/ Hopper/ Requested Speed");
+        requestedVoltage = NerdLog.getdouble("Fuel Management/ Hopper/ Requested Voltage");
+
+
+        speedControl.setSetpoint(requestedSpeed);
+
     }
 
     private void configureMotor(boolean invert) {

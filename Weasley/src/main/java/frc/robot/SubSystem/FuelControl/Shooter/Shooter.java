@@ -21,12 +21,9 @@ public class Shooter implements ShooterIO {
     double RequestedVolts = 0.00;
     double bangCrtlTolerance = 0.00;
 
-    //ShuffleBoard Entrys:
-    GenericEntry targetSpeedEntry;
-    GenericEntry requestedVoltageEntry;
-    GenericEntry bangCrtlToleranceEntry;
 
     //logging:
+    double velocityRadPerSec;
 
     //functionals:
     BangBangController bangCrtl;
@@ -36,26 +33,23 @@ public class Shooter implements ShooterIO {
     /**
      * 
      * @param motor - take a guess
-     * @param tab - preferred tab for more control
      */
-    public Shooter(SparkMax motor, ShuffleboardTab tab) {
+    public Shooter(SparkMax motor) {
         this.motor = motor;
-        this.shuffleTab = tab;
         configureMotor(false);
         this.encoder = motor.getEncoder();
         bangCrtl = new BangBangController();
         bangCrtl.setTolerance(bangCrtlTolerance);
 
-        targetSpeedEntry = tab.add("target Shooter Speed RadPerSec", 0).getEntry();
-        requestedVoltageEntry = tab.add("Shooter Voltage To Request", 0.00).getEntry();
-        bangCrtlToleranceEntry = tab.add("Shoot BangBang Controller Tolerance", 0.00).getEntry();
+        NerdLog.logDouble("Fuel Control/Shooter/ requestedVolts", RequestedVolts);
+        NerdLog.logDouble("Fuel Control/Shooter/ target Speed Rad Per Sec", targetSpeedRadPerSec);
+        NerdLog.logDouble("Fuel Control/Shooter/ bang control Tolerance", bangCrtlTolerance);
     }
     
     @Override
     public void shoot(boolean invert) {
-        bangCrtl.setSetpoint(targetSpeedRadPerSec);
-        if (!invert) motor.setVoltage(RequestedVolts * bangCrtl.calculate(Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity())));
-        else motor.setVoltage(RequestedVolts * bangCrtl.calculate(Units.rotationsPerMinuteToRadiansPerSecond(Math.abs(encoder.getVelocity()))));
+        if (!invert) motor.setVoltage(RequestedVolts * bangCrtl.calculate(velocityRadPerSec));
+        else motor.setVoltage(RequestedVolts * bangCrtl.calculate(velocityRadPerSec));
     }
 
     @Override
@@ -70,14 +64,19 @@ public class Shooter implements ShooterIO {
 
     @Override
     public void periodic() {
+        velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
+
         NerdLog.logBooleanVariable("Fuel Control/Shooter/ Shooter is Shooting", isShooting());
-        NerdLog.logBooleanVariable("Fuel Control/Shooter/ Shooter is Above set Speed", Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity()) > targetSpeedRadPerSec);
-        NerdLog.logDouble("Fuel Control/Shooter/ Encoder Velocity RadPerSec", Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity()));
-        NerdLog.logDouble("Fuel Control/Shooter/ target speed RadPerSec", targetSpeedRadPerSec);
-        targetSpeedRadPerSec = targetSpeedEntry.getDouble(0.00);
-        RequestedVolts = requestedVoltageEntry.getDouble(0.00);
-        bangCrtlTolerance = bangCrtlToleranceEntry.getDouble(0.00);
+        NerdLog.logBooleanVariable("Fuel Control/Shooter/ Shooter is Above set Speed", velocityRadPerSec > targetSpeedRadPerSec);
+        NerdLog.logDouble("Fuel Control/Shooter/ Encoder Velocity RadPerSec", velocityRadPerSec);
+
+
+        targetSpeedRadPerSec = NerdLog.getdouble("Fuel Control/Shooter/ requestedVolts");
+        RequestedVolts = NerdLog.getdouble("Fuel Control/Shooter/ target Speed Rad Per Sec");
+        bangCrtlTolerance = NerdLog.getdouble("Fuel Control/Shooter/ bang control Tolerance");
+
         bangCrtl.setTolerance(bangCrtlTolerance);
+        bangCrtl.setSetpoint(targetSpeedRadPerSec);
 
     }
 

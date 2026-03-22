@@ -24,11 +24,8 @@ import frc.robot.SubSystem.Swerve.Gyro.Pidgeon2IO;
 
 public class RobotContainer {
   ControllerIO Controller = new JoystickIO(0);
-  double num = 0.00;
 
   final double driveSpeedFactor = 1;
-  String[] PIDModes = {"P", "I", "D"};
-  int PIDModeSelection = 0;
 
 
   Drive swerve;
@@ -63,8 +60,6 @@ public class RobotContainer {
 
   public void roboPeriodic() {
     swerve.periodic();
-    NerdLog.logDouble("smartDash Test", num);
-    
   }
 
   public void enabled() {

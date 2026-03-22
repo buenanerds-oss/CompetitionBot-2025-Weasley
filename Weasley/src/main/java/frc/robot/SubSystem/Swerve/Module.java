@@ -89,7 +89,7 @@ public class Module extends ModuleMotorConfig implements ModuleIO {
         
         //turning
             turnPID.setSetpoint(desiredState.angle.getRadians());
-            turnMotor.setVoltage(turnPID.calculate(AbsEncoder.get()));
+            turnMotor.setVoltage(turnPID.calculate(currentSwerveState.angle.getRadians()));
           
         //Driving
             //manual cosine scaling because the abs encoder doesnt want to work for the scaling:
@@ -105,7 +105,7 @@ public class Module extends ModuleMotorConfig implements ModuleIO {
             driveVolts = driveMotor.getAppliedOutput() * driveMotor.getBusVoltage();
         currentSwerveState = new SwerveModuleState(driveMotor.getEncoder().getVelocity() * SwerveConstants.wheelRadiusMeters, 
         new Rotation2d(AbsEncoder.get()));
-        currentswervePosition = new SwerveModulePosition(driveMotor.getEncoder().getPosition() * SwerveConstants.wheelRadiusMeters, new Rotation2d(AbsEncoder.get()));
+        currentswervePosition = new SwerveModulePosition(driveMotor.getEncoder().getPosition() * SwerveConstants.wheelRadiusMeters, currentSwerveState.angle);
         
     }
 
