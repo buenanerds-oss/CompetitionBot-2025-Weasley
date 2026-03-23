@@ -28,17 +28,18 @@ public class FuelControl{
 
     public FuelControl(SparkMax shootermotor, SparkMax hopperMotor) {
         this.hopper = new Hopper(hopperMotor);
-        this.shooter = new Shooter(hopperMotor);
+        this.shooter = new Shooter(shootermotor);
+        hopperOutTimer = new Timer();
 
-        NerdLog.logDouble("Fuel Management/ Hopper out enabled timer", hopperOutDisabledTimeSec);
-        NerdLog.logDouble("Fuel Management/ Hopper out disnabled timer", hopperOutDisabledTimeSec);
+        NerdLog.logDouble("Fuel Control/ Hopper out enabled timer", hopperOutDisabledTimeSec);
+        NerdLog.logDouble("Fuel Control/ Hopper out disnabled timer", hopperOutDisabledTimeSec);
     }
 
-    public void startShooter() {
+    public void shootShooter() {
         shooter.shoot(false);
     }
 
-    public void startShooterInverted() {
+    public void shootShooterInverted() {
         if (!shooter.isShooting()) shooter.shoot(true);
     }
 
@@ -76,8 +77,8 @@ public class FuelControl{
             hopperOutTimer.reset();
         }
 
-        hopperOutEnabledTimeSec = NerdLog.getdouble("Fuel Management/ Hopper out enabled timer");
-        hopperOutDisabledTimeSec =  NerdLog.getdouble("Fuel Management/ Hopper out disnabled timer");
+        hopperOutEnabledTimeSec = NerdLog.getdouble("Fuel Control/ Hopper out enabled timer");
+        hopperOutDisabledTimeSec =  NerdLog.getdouble("Fuel Control/ Hopper out disabled timer");
     }
 
     

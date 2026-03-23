@@ -39,8 +39,8 @@ public class Hopper implements HopperIO{
 
         speedControl.setSetpoint(requestedSpeed);
 
-        NerdLog.logDouble("Fuel Management/ Hopper/ Requested Speed", requestedSpeed);
-        NerdLog.logDouble("Fuel Management/ Hopper/ Requested Voltage", requestedSpeed);
+        NerdLog.logDouble("Fuel Control/Hopper/ Requested Speed", requestedSpeed);
+        NerdLog.logDouble("Fuel Control/Hopper/ Requested Voltage", requestedSpeed);
     }
 
     @Override

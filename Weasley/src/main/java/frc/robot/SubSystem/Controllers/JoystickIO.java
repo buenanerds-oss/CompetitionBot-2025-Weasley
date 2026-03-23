@@ -1,5 +1,6 @@
 package frc.robot.SubSystem.Controllers;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -67,17 +68,17 @@ public class JoystickIO implements ControllerIO{
 
     @Override
     public double getDriveX() {
-        return -joystick.getY();
+        return -MathUtil.applyDeadband(joystick.getY(), 0.1);
     }
 
     @Override
     public double getDriveY() {
-        return -joystick.getX();
+        return - MathUtil.applyDeadband(joystick.getX(), 0.1);
     }
 
     @Override
     public double getDriveTwist() {
-        return -joystick.getRawAxis(Axis.JOYSTICK_ROTATION.getAxis()); // TODO invert if needed;
+        return -MathUtil.applyDeadband(joystick.getRawAxis(Axis.JOYSTICK_ROTATION.getAxis()), 0.1); // TODO invert if needed;
     }
 
     @Override

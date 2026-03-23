@@ -4,14 +4,19 @@
 
 package frc.robot;
 
+import java.util.ResourceBundle.Control;
+
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.SubSystem.Climb.Climb;
+import frc.robot.SubSystem.Climb.ClimbIO;
 import frc.robot.SubSystem.Controllers.ControllerIO;
 import frc.robot.SubSystem.Controllers.JoystickIO;
 import frc.robot.SubSystem.Controllers.XboxControllerIO;
+import frc.robot.SubSystem.FuelControl.FuelControl;
 import frc.robot.SubSystem.Logging.GroupLogger;
 import frc.robot.SubSystem.Logging.NerdLog;
 import frc.robot.SubSystem.Swerve.Drive;
@@ -23,18 +28,20 @@ import frc.robot.SubSystem.Swerve.Gyro.GyroSim;
 import frc.robot.SubSystem.Swerve.Gyro.Pidgeon2IO;
 
 public class RobotContainer {
-  ControllerIO Controller = new JoystickIO(0);
+  ControllerIO Controller = new XboxControllerIO(0);
 
   final double driveSpeedFactor = 1;
 
 
   Drive swerve;
+  FuelControl fuelCrtl;
+  ClimbIO climb;
 
   public RobotContainer() {
     NerdLog.startLog();
    GroupLogger.startGroupLogger();
-
-    ModuleIO[] modules = new ModuleIO[4];
+   /*
+   ModuleIO[] modules = new ModuleIO[4];
     GyroIO gyro;
     if (Robot.isReal()) {
       for (int i = 0; i <= 3; i++) {
@@ -50,31 +57,35 @@ public class RobotContainer {
       else gyro = new GyroSim();
     }
     
-    swerve = new Drive(gyro, modules);
-
-    configureControls();
+    swerve = new Drive(gyro, modules);*/
+    fuelCrtl = new FuelControl(RobotMap.shooterMotor, RobotMap.hopperMotor);
+    climb = new Climb(RobotMap.climbMotor);
 
   }
 
   
 
   public void roboPeriodic() {
-    swerve.periodic();
+    //swerve.periodic();
+    fuelCrtl.periodic();
+    climb.periodic();
   }
 
   public void enabled() {
     
     NerdLog.logDouble("joystick X", Controller.getDriveX());
     NerdLog.logDouble("joystick y", Controller.getDriveY());
-    swerve.move(Controller.getDriveX(), Controller.getDriveY(), Controller.getDriveTwist());
+    //swerve.move(Controller.getDriveX(), Controller.getDriveY(), Controller.getDriveTwist());
+    if (Controller.startShooter()) fuelCrtl.shootShooter();
+    if (Controller.startShooterInverted()) fuelCrtl.shootShooterInverted();
+    if (Controller.hopperOut()) fuelCrtl.outtake();
+    if (Controller.hopperIn()) fuelCrtl.intake();
+    if (Controller.climbUp() && !climb.atLimit(true)) climb.climbUp();
+    if (Controller.climbDown() && !climb.atLimit(false)) climb.climbDown();
   }
 
   public void disabledPeriodic() {
 
-  }
-
-  private void configureControls() {
-   
   }
 
 

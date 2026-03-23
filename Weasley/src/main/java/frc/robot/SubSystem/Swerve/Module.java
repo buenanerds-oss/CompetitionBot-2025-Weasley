@@ -51,7 +51,7 @@ public class Module extends ModuleMotorConfig implements ModuleIO {
         this.index = index;
         this.turnMotor = turnMotor;
         this.driveMotor = driveMotor;
-        this.AbsEncoder = RobotMap.swerveAbsEncoders[index];
+        //this.AbsEncoder = RobotMap.swerveAbsEncoders[index];
 
 
         //from the ModuleMotorConfig Class

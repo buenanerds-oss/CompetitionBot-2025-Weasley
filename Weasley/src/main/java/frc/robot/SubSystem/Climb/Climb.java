@@ -36,6 +36,11 @@ public class Climb implements ClimbIO{
     }
 
     @Override
+    public boolean atLimit(boolean checkUpLimit) {
+        return checkUpLimit? encoder.getPosition() > upLimitRAD : encoder.getPosition() < downLimitRAD;
+    }
+
+    @Override
     public void periodic() {
         NerdLog.logDouble("Climb/ Position", encoder.getPosition() * (2 * Math.PI)); // records in radians
         NerdLog.logBooleanVariable("Climb/ @ Up limit", encoder.getPosition() * (2*Math.PI) >= upLimitRAD);
