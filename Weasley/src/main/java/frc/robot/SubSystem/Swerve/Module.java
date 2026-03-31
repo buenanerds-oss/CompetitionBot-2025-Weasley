@@ -51,7 +51,7 @@ public class Module extends ModuleMotorConfig implements ModuleIO {
         this.index = index;
         this.turnMotor = turnMotor;
         this.driveMotor = driveMotor;
-        //this.AbsEncoder = RobotMap.swerveAbsEncoders[index];
+        this.AbsEncoder = RobotMap.swerveAbsEncoders[index];
 
 
         //from the ModuleMotorConfig Class
@@ -83,7 +83,7 @@ public class Module extends ModuleMotorConfig implements ModuleIO {
     @Override
     public void setDesiredSwerveState(SwerveModuleState desiredState) {
         desiredState.optimize(new Rotation2d(currentSwerveState.angle.getRadians()));// ensures the turning setpoint takes the most effecient route
-        //desiredState.cosineScale(new Rotation2d(currentSwerveState.angle.getRadians()));// prevents undesired rotation or translation
+        desiredState.cosineScale(new Rotation2d(currentSwerveState.angle.getRadians()));// prevents undesired rotation or translation
         this.desiredState = desiredState;
 
         
@@ -93,7 +93,7 @@ public class Module extends ModuleMotorConfig implements ModuleIO {
           
         //Driving
             //manual cosine scaling because the abs encoder doesnt want to work for the scaling:
-            desiredState.speedMetersPerSecond *= Math.cos(turnPID.getError()); 
+            //desiredState.speedMetersPerSecond *= Math.cos(turnPID.getError()); 
       
             driveMotor.setVoltage(-desiredState.speedMetersPerSecond*5); // was *5
         
@@ -117,6 +117,7 @@ public class Module extends ModuleMotorConfig implements ModuleIO {
 
     @Override
     public void periodic() {
+        GroupLogger.logDoubleGroup("abs Encode readings", AbsEncoder.get(), index, 4);
         GroupLogger.logStructGroup("Drive/Modules/Swerve Module States", currentSwerveState, SwerveModuleState.struct, index, 4);
         GroupLogger.logDoubleGroup("Drive/Modules/Swerve Module Turn Amps", turnAmps, index, 4);
         GroupLogger.logDoubleGroup("Drive/Modules/Swerve Module Turn volts", turnVolts, index, 4);

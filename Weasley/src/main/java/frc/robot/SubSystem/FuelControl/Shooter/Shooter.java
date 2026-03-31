@@ -8,6 +8,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.controller.BangBangController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -17,15 +18,16 @@ public class Shooter implements ShooterIO {
 
     //for ShuffleBoard:
     ShuffleboardTab shuffleTab;
-    double targetSpeedRadPerSec = 0.00;
+    double targetSpeedRadPerSec = 100;
     double RequestedVolts = 0.00;
-    double bangCrtlTolerance = 0.00;
+    double bangCrtlTolerance = 0.25/2;
 
 
     //logging:
     double velocityRadPerSec;
 
     //functionals:
+    PIDController pidCrtl;
     BangBangController bangCrtl;
     SparkMax motor;
     RelativeEncoder encoder;
@@ -40,6 +42,7 @@ public class Shooter implements ShooterIO {
         this.encoder = motor.getEncoder();
         bangCrtl = new BangBangController();
         bangCrtl.setTolerance(bangCrtlTolerance);
+        pidCrtl = new PIDController(0.5, 0.0, 0.0);
 
         NerdLog.logDouble("Fuel Control/Shooter/ requestedVolts", RequestedVolts);
         NerdLog.logDouble("Fuel Control/Shooter/ target Speed Rad Per Sec", targetSpeedRadPerSec);
@@ -48,8 +51,8 @@ public class Shooter implements ShooterIO {
     
     @Override
     public void shoot(boolean invert) {
-        if (!invert) motor.setVoltage(RequestedVolts * bangCrtl.calculate(velocityRadPerSec));
-        else motor.setVoltage(RequestedVolts * bangCrtl.calculate(velocityRadPerSec));
+        if (!invert) motor.setVoltage(RequestedVolts);//motor.setVoltage(RequestedVolts * bangCrtl.calculate(velocityRadPerSec));
+        else motor.setVoltage(-RequestedVolts);//motor.setVoltage(RequestedVolts * bangCrtl.calculate(velocityRadPerSec));
     }
 
     @Override
@@ -59,7 +62,7 @@ public class Shooter implements ShooterIO {
 
     @Override
     public boolean isShooting() {
-        return bangCrtl.atSetpoint();//Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
+        return true;//velocityRadPerSec > targetSpeedRadPerSec - bangCrtlTolerance;//bangCrtl.atSetpoint();//Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
     }
 
     @Override
@@ -77,6 +80,8 @@ public class Shooter implements ShooterIO {
 
         bangCrtl.setTolerance(bangCrtlTolerance);
         bangCrtl.setSetpoint(targetSpeedRadPerSec);
+
+        pidCrtl.setSetpoint(targetSpeedRadPerSec);
 
     }
 

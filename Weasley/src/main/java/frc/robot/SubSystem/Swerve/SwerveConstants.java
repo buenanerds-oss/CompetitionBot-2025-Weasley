@@ -3,12 +3,13 @@ package frc.robot.SubSystem.Swerve;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.RobotMap;
 
 public class SwerveConstants {
 
     //dimensions
-    public static final double driveWidth = Units.inchesToMeters(29);
-    public static final double driveLength = Units.inchesToMeters(29);
+    public static final double driveWidth = Units.inchesToMeters(17);
+    public static final double driveLength = Units.inchesToMeters(13.5);
 
     //turn motor
     public static final double turnGearRatio = 8.75;
@@ -31,7 +32,7 @@ public class SwerveConstants {
         new Translation2d(-driveLength/2, driveWidth/2), new Translation2d(-driveLength/2, -driveWidth/2)};
     public static final double mass_KG = 45.3592;
     public static final double MomentOfInertia = 0.00;
-    public static final int GyroCANID = 10;
+    public static final int GyroCANID = RobotMap.pidgeon2CANID; 
 
 
 }

@@ -43,6 +43,10 @@ public class FuelControl{
         if (!shooter.isShooting()) shooter.shoot(true);
     }
 
+    public void stopShooting() {
+        shooter.stop();
+    }
+
 
     //TODO: test if you can have it automatically start shooter when you set the hopper
     public void outtake() {

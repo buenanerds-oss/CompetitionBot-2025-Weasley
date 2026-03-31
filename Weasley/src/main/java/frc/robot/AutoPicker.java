@@ -61,7 +61,7 @@ public class AutoPicker {
         switch (routine) {
             case SHOOT_BALLS: ShootBalls(); break;
             case CLIMB: findClimbRack(); Climb(); break;
-            case SHOOT_BALLS_AND_CLIMB: ShootBalls(); findClimbRack(); Climb(); break; // could use recursion, not lazy enough
+            case SHOOT_BALLS_AND_CLIMB:  break; // could use recursion, not lazy enough
             case SHOOT_BALLS_AND_COLLECT_DEPOSITE: break;
             case SHOOT_BALLS_AND_GO_MIDDLE: break;
         }

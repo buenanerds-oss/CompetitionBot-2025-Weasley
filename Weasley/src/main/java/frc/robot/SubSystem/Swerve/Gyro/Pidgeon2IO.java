@@ -12,7 +12,7 @@ public class Pidgeon2IO  implements GyroIO {
     Pigeon2 gyro;
     StatusSignal<Angle> yaw;
     public Pidgeon2IO() {
-       gyro = new Pigeon2(SwerveConstants.GyroCANID);
+       gyro = new Pigeon2(SwerveConstants.GyroCANID); // the dirivation of this ID is effeciency at it's finest
 
        gyro.getConfigurator().apply(new Pigeon2Configuration());
        gyro.getConfigurator().setYaw(0.0);

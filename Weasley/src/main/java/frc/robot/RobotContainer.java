@@ -40,7 +40,7 @@ public class RobotContainer {
   public RobotContainer() {
     NerdLog.startLog();
    GroupLogger.startGroupLogger();
-   /*
+   
    ModuleIO[] modules = new ModuleIO[4];
     GyroIO gyro;
     if (Robot.isReal()) {
@@ -57,7 +57,7 @@ public class RobotContainer {
       else gyro = new GyroSim();
     }
     
-    swerve = new Drive(gyro, modules);*/
+    swerve = new Drive(gyro, modules);
     fuelCrtl = new FuelControl(RobotMap.shooterMotor, RobotMap.hopperMotor);
     climb = new Climb(RobotMap.climbMotor);
 
@@ -66,7 +66,7 @@ public class RobotContainer {
   
 
   public void roboPeriodic() {
-    //swerve.periodic();
+    swerve.periodic();
     fuelCrtl.periodic();
     climb.periodic();
   }
@@ -75,8 +75,9 @@ public class RobotContainer {
     
     NerdLog.logDouble("joystick X", Controller.getDriveX());
     NerdLog.logDouble("joystick y", Controller.getDriveY());
-    //swerve.move(Controller.getDriveX(), Controller.getDriveY(), Controller.getDriveTwist());
+    swerve.move(Controller.getDriveX(), Controller.getDriveY(), Controller.getDriveTwist());
     if (Controller.startShooter()) fuelCrtl.shootShooter();
+    else {fuelCrtl.stopShooting();}
     if (Controller.startShooterInverted()) fuelCrtl.shootShooterInverted();
     if (Controller.hopperOut()) fuelCrtl.outtake();
     if (Controller.hopperIn()) fuelCrtl.intake();

@@ -6,12 +6,12 @@ import edu.wpi.first.wpilibj.AnalogEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 public class RobotMap {
-    /*private static double[] swerveAbsZeroPos = { 
-        // if expereicneing the Desired states going opposite to eachother @ certaint points, add PI to zero that has the issue
-        2.83,//2.830042 + Math.PI,//4.071693,
-        0.892,//4.071693,//2.830042 + Math.PI,
-        5.14,//5.274043,
-        5.35//1.992770 + Math.PI
+    private static double[] swerveAbsZeroPos = { 
+        // if experiencing the Desired states going opposite to eachother @ certaint points, add PI to zero that has the issue
+        5.573,//2.830042 + Math.PI,//4.071693,
+        1.984,//4.071693,//2.830042 + Math.PI,
+        3.825,//5.274043,
+        1.239//1.992770 + Math.PI
     };
 
     public static SparkMax[] SwerveTurnMotors = {new SparkMax(2, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless),
@@ -27,10 +27,11 @@ public class RobotMap {
         new AnalogEncoder(1, 2*Math.PI, swerveAbsZeroPos[1]),
         new AnalogEncoder(2, 2*Math.PI, swerveAbsZeroPos[2]),
         new AnalogEncoder(3, 2*Math.PI, swerveAbsZeroPos[3])
-    }; */
+    };
+    public static int pidgeon2CANID = 9;
 
-    public static SparkMax hopperMotor = new SparkMax(9, MotorType.kBrushless);
-    public static SparkMax shooterMotor = new SparkMax(10,  MotorType.kBrushless);
-    public static SparkMax climbMotor = new SparkMax(11,  MotorType.kBrushless);
+    public static SparkMax hopperMotor = new SparkMax(12, MotorType.kBrushless);
+    public static SparkMax shooterMotor = new SparkMax(11,  MotorType.kBrushless);
+    public static SparkMax climbMotor = new SparkMax(10,  MotorType.kBrushless);
     
 }

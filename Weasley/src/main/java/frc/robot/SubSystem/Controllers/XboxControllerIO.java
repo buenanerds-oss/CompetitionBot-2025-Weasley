@@ -19,12 +19,12 @@ public class XboxControllerIO implements ControllerIO{
 
     @Override
     public double getDriveX() {
-        return MathUtil.applyDeadband(-xbox.getLeftY(), 0.1);//-xbox.getLeftX();
+        return MathUtil.applyDeadband(xbox.getLeftY(), 0.1);//-xbox.getLeftX();
     }
 
     @Override
     public double getDriveY() {
-        return MathUtil.applyDeadband(-xbox.getLeftX(), 0.1);//-xbox.getLeftY();
+        return MathUtil.applyDeadband(xbox.getLeftX(), 0.1);//-xbox.getLeftY();
     }
 
     @Override
@@ -35,7 +35,7 @@ public class XboxControllerIO implements ControllerIO{
     @Override
     public boolean startShooter() {
         if (xbox.getRightBumperButtonPressed()) startShooter = startShooter? false:true;
-        return startShooter;
+        return xbox.getRightBumperButton();
     }
 
     @Override

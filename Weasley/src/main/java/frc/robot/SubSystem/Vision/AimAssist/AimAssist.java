@@ -16,21 +16,28 @@ import frc.robot.SubSystem.Vision.VisionIO;
 
 public class AimAssist {
     VisionIO vision;
-    int indexAimingCamera;
+    double[] degreesRobotFront;
     double reccomendedHeading;
+    double[] yawPerCam;
     
     ProfiledPIDController headingController = new ProfiledPIDController(0, 0, 0, 
         new TrapezoidProfile.Constraints(getreccomendedHeading(), getreccomendedHeading()));
 
-    public AimAssist(VisionIO vision,  int indexAimingCamera) {
+        /**
+         * 
+         * @param vision
+         * @param degreesRobotFront - the yaw in degrees that coordinates to the tag being directly in front of the robot
+         */
+    public AimAssist(VisionIO vision,  double[] degreesRobotFront) {
         this.vision = vision;
-        this.indexAimingCamera = indexAimingCamera;
+        this.degreesRobotFront = degreesRobotFront;
+        yawPerCam = new double[degreesRobotFront.length];
 
     }
 
     /**
      * 
-     * @return
+     * @return the heading that the vision wants to to turn to
      */
     public double getreccomendedHeading() {
         return reccomendedHeading;
@@ -39,15 +46,13 @@ public class AimAssist {
     public void periodic() {
 
         Optional<List<PhotonTrackedTarget>>[] targets =  vision.getTargets();
-        boolean aimingCameraHasTarget = false;;
-        for (int i  = 0; i< targets.length; i++) {
+        for (int i  = 0; i< targets.length; i++) { // i = per camera selection
             if (targets[i].isEmpty()) {
                 continue;
             }
             
             //iterate over cameras with basic checks
             for (PhotonTrackedTarget target : targets[i].get()) {
-                if (target.getPoseAmbiguity() > 0.2) continue;
 
                 //check for hub apriltags on the inside of the alliance zones, trying to score from neutral is a major foul
                 if (target.getFiducialId() == 9 || 
@@ -62,16 +67,17 @@ public class AimAssist {
                 target.getFiducialId() == 26 ||
                 target.getFiducialId() == 21 ||
                 target.getFiducialId() == 24) {
-                    if (i == indexAimingCamera) {
-                        reccomendedHeading = target.getYaw();
-                    }
-                    else if  (!aimingCameraHasTarget){
-                        // if its not the aiming camera, get it out of sight:
-                        reccomendedHeading = target.getYaw() < 0? 1 : -1;
-                        // TODO: may need to bring this down if the camera Aiming Camera struggles to pick up the tag
-                    }
+                
+                yawPerCam[i] = target.getYaw();
+                if (target.getPoseAmbiguity() > 0.2) continue;
+
+                   reccomendedHeading = degreesRobotFront[i] - target.getYaw();
                 }
             }
         }
+    }
+
+    public double[] getYawsFromHub() {
+        return yawPerCam;
     }
 }
