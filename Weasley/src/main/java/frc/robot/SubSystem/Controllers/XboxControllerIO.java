@@ -19,6 +19,7 @@ public class XboxControllerIO implements ControllerIO{
 
     @Override
     public double getDriveX() {
+        
         return MathUtil.applyDeadband(xbox.getLeftY(), 0.1);//-xbox.getLeftX();
     }
 
@@ -35,7 +36,7 @@ public class XboxControllerIO implements ControllerIO{
     @Override
     public boolean startShooter() {
         if (xbox.getRightBumperButtonPressed()) startShooter = startShooter? false:true;
-        return xbox.getRightBumperButton();
+        return startShooter;//xbox.getRightBumperButton();
     }
 
     @Override

@@ -20,13 +20,16 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.SubSystem.Climb.Climb;
 import frc.robot.SubSystem.Climb.ClimbIO;
 import frc.robot.SubSystem.FuelControl.FuelControl;
 import frc.robot.SubSystem.Swerve.Drive;
+import frc.robot.SubSystem.Swerve.SwerveConstants;
 import frc.robot.SubSystem.Vision.Vision;
 import frc.robot.SubSystem.Vision.VisionIO;
+import edu.wpi.first.wpilibj.Timer;;
 
 public class AutoPicker {
     private static PIDController driveXPID = new PIDController(0, 0, 0);
@@ -50,23 +53,67 @@ public class AutoPicker {
      * @param climb
      * @param vision
      */
-    public static void SupplySubSystems(Drive drive, FuelControl fuelCrtl, ClimbIO climb, VisionIO vision, Transform3d[] robotToCamera) {
+    public static void supplySubSystems(Drive drive, FuelControl fuelCrtl, ClimbIO climb, VisionIO vision, Transform3d[] robotToCamera) {
     }
 
     public static enum AutoRoutines {
         SHOOT_BALLS, CLIMB, SHOOT_BALLS_AND_CLIMB, SHOOT_BALLS_AND_COLLECT_DEPOSITE, SHOOT_BALLS_AND_GO_MIDDLE 
     }
 
-    public static void PickAuto(AutoRoutines routine) {
+    public static void pickAuto(AutoRoutines routine) {
         switch (routine) {
             case SHOOT_BALLS: ShootBalls(); break;
             case CLIMB: findClimbRack(); Climb(); break;
-            case SHOOT_BALLS_AND_CLIMB:  break; // could use recursion, not lazy enough
+            case SHOOT_BALLS_AND_CLIMB:
+                Timer shootTimer = new Timer();
+                shootTimer.start();
+                while (!shootTimer.hasElapsed(8)) {
+                    fuelCrtl.shootShooter();
+                    fuelCrtl.outtake();
+                }
+                while (climb.atLimit(false)) climb.climbDown();
+                // distance from wall to hub - (distance from wall to tower  + (robtolength - camera distance from front))
+                driveBackToTower(Units.inchesToMeters(158.6) - (Units.inchesToMeters(45) + (SwerveConstants.driveLength - Units.inchesToMeters(0.25))));
+                while (climb.atLimit(true)) climb.climbUp();
+                break;
             case SHOOT_BALLS_AND_COLLECT_DEPOSITE: break;
             case SHOOT_BALLS_AND_GO_MIDDLE: break;
         }
 
     }
+
+    private static void driveBackToTower(double desiredDistanceFromHubMeters) {
+        //first get distance from hub using vision, then drive until at the desired distance from the hub:
+        double distanceFromHubMeters = 0;
+        while (distanceFromHubMeters < desiredDistanceFromHubMeters) {
+            Optional<List<PhotonTrackedTarget>>[] targets = vision.getTargets();
+            for (int i = 0; i < targets.length; i++ ) {
+                if (targets[i].isEmpty()) continue;
+
+                double lowestAmbiguity = 0.75; // will base the distance off the cameras with the lowest ambiguity
+                for (PhotonTrackedTarget target: targets[i].get()) { // per camera
+                    if (target.getPoseAmbiguity() > lowestAmbiguity) continue;
+                    lowestAmbiguity = target.getPoseAmbiguity();
+                    if (target.getFiducialId() == 9 ||
+                    target.getFiducialId() == 10 ||
+                    target.getFiducialId() == 25 ||
+                    target.getFiducialId() == 26) distanceFromHubMeters = PhotonUtils.calculateDistanceToTargetMeters(
+                          robotToCamera[i].getZ(),
+                          44.25, 
+                          robotToCamera[i].getRotation().getY(),
+                          target.getPitch());
+                }
+            }
+
+            //set drive proportional to the distance from the hub:
+            double driveX = -distanceFromHubMeters/Units.inchesToMeters(158.6); //scaled with the distance from hub to the wall
+            drive.move(driveX, 0, 0);
+        }
+    }
+
+
+
+    //everything after is deprecated but left for those after me to maybe learn from, if they can get a takeaway from it.
     /**
      * for tuning the forward pid controller, forward 1 meter
      */

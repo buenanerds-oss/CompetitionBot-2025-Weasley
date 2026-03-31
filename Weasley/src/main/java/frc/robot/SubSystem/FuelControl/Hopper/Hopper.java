@@ -40,7 +40,7 @@ public class Hopper implements HopperIO{
         speedControl.setSetpoint(requestedSpeed);
 
         NerdLog.logDouble("Fuel Control/Hopper/ Requested Speed", requestedSpeed);
-        NerdLog.logDouble("Fuel Control/Hopper/ Requested Voltage", requestedSpeed);
+        NerdLog.logDouble("Fuel Control/Hopper/ Requested Voltage", requestedVoltage);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class Hopper implements HopperIO{
 
     @Override
     public void hopperOut() {
-        motor.set(-requestedVoltage * speedControl.calculate(velocityRadPerSec));
+        motor.set(-requestedVoltage * speedControl.calculate(-velocityRadPerSec));
     }
 
     @Override
