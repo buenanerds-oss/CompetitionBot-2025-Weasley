@@ -46,6 +46,12 @@ public class Shooter implements ShooterIO {
         NerdLog.logDouble("Fuel Control/Shooter/ requestedVolts", RequestedVolts);
         NerdLog.logDouble("Fuel Control/Shooter/ target Speed Rad Per Sec", targetSpeedRadPerSec);
         NerdLog.logDouble("Fuel Control/Shooter/ control Tolerance", CrtlTolerance);
+        /* 
+        NerdLog.logDouble("Fuel Control/Shooter/ P", pidCrtl.getP());
+        NerdLog.logDouble("Fuel Control/Shooter/ I", pidCrtl.getI());
+        NerdLog.logDouble("Fuel Control/Shooter/ D", pidCrtl.getD());
+        */
+        
     }
     
     @Override
@@ -106,6 +112,11 @@ public class Shooter implements ShooterIO {
         //RequestedVolts = NerdLog.getdouble("Fuel Control/Shooter/ requestedVolts");
         targetSpeedRadPerSec= NerdLog.getdouble("Fuel Control/Shooter/ target Speed Rad Per Sec");
         CrtlTolerance = NerdLog.getdouble("Fuel Control/Shooter/ control Tolerance");
+        /*
+        pidCrtl.setP(NerdLog.getdouble("Fuel Control/Shooter/ P"));
+        pidCrtl.setI(NerdLog.getdouble("Fuel Control/Shooter/ I"));
+        pidCrtl.setD(NerdLog.getdouble("Fuel Control/Shooter/ D"));
+        */
 
     }
 
