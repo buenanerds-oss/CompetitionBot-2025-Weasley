@@ -1,7 +1,11 @@
 package frc.robot;
 
+import org.photonvision.PhotonCamera;
+
 import com.revrobotics.spark.SparkMax;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.AnalogEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -33,5 +37,12 @@ public class RobotMap {
     public static SparkMax hopperMotor = new SparkMax(12, MotorType.kBrushless);
     public static SparkMax shooterMotor = new SparkMax(11,  MotorType.kBrushless);
     public static SparkMax climbMotor = new SparkMax(10,  MotorType.kBrushless);
+
+    public static PhotonCamera c270 = new PhotonCamera("C270");
+    public static PhotonCamera nexigo = new PhotonCamera("NEXIGO");
+    public static Transform3d robotToCameras[] = {
+        new Transform3d(0, 0, 0, new Rotation3d(0,0,0)),
+        new Transform3d(0, 0, 0, new Rotation3d(0,0,0))
+    };
     
 }

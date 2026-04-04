@@ -78,6 +78,7 @@ public class Vision implements VisionIO{
             if (!latestResults[i].hasTargets()) continue;
 
             targets[i] = Optional.of(latestResults[i].getTargets());
+            
 
             estimators[i].addHeadingData(Timer.getTimestamp(), drive.getEstimatedPose().getRotation());
             EstimatedPoses[i] = estimators[i].estimatePnpDistanceTrigSolvePose(latestResults[i]);
