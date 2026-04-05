@@ -77,13 +77,15 @@ public class Vision implements VisionIO{
             latestResults[i] = allPhotonResults[i].get(allPhotonResults[i].size() -1);
 
             if (!latestResults[i].hasTargets()) continue;
+            
+            
 
 
             targets[i] = Optional.of(latestResults[i].getTargets());
             
 
             estimators[i].addHeadingData(Timer.getTimestamp(), drive.getEstimatedPose().getRotation());
-            
+
             if (targets[i].get().size() > 1) EstimatedPoses[i] = estimators[i].estimateCoprocMultiTagPose(latestResults[i]);
             else if (targets[i].get().size() == 1) EstimatedPoses[i] = estimators[i].estimatePnpDistanceTrigSolvePose(latestResults[i]);
 
