@@ -78,23 +78,28 @@ public class Vision implements VisionIO{
 
             if (!latestResults[i].hasTargets()) continue;
 
+
             targets[i] = Optional.of(latestResults[i].getTargets());
             
 
             estimators[i].addHeadingData(Timer.getTimestamp(), drive.getEstimatedPose().getRotation());
-            EstimatedPoses[i] = estimators[i].estimatePnpDistanceTrigSolvePose(latestResults[i]);
+            
+            if (targets[i].get().size() > 1) EstimatedPoses[i] = estimators[i].estimateCoprocMultiTagPose(latestResults[i]);
+            else if (targets[i].get().size() == 1) EstimatedPoses[i] = estimators[i].estimatePnpDistanceTrigSolvePose(latestResults[i]);
 
-            if (EstimatedPoses[i].isEmpty()) continue;
 
-            // morefiltering before accepting a Pose;
+            //filtering the poses:
 
             boolean keepPose = true;
+
             if (targets[i].get().size() != 0) keepPose = false; // must have target
             else if (targets[i].get().size() == 1) {
                 for (PhotonTrackedTarget target : targets[i].get()) {
                     if (target.getPoseAmbiguity() > maxAmbiguity) keepPose = false; // must be discernable
                 }
             }
+
+            if (EstimatedPoses[i].isEmpty()) keepPose = false;
 
                 //must be in the field:
             if (EstimatedPoses[i].get().estimatedPose.getY() < 0 && EstimatedPoses[i].get().estimatedPose.getY() > 8.07) keepPose = false;
