@@ -6,6 +6,8 @@ package frc.robot;
 
 import java.util.ResourceBundle.Control;
 
+import org.photonvision.PhotonCamera;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -28,6 +30,8 @@ import frc.robot.SubSystem.Swerve.ModuleSIm;
 import frc.robot.SubSystem.Swerve.Gyro.GyroIO;
 import frc.robot.SubSystem.Swerve.Gyro.GyroSim;
 import frc.robot.SubSystem.Swerve.Gyro.Pidgeon2IO;
+import frc.robot.SubSystem.Vision.Vision;
+import frc.robot.SubSystem.Vision.VisionIO;
 
 public class RobotContainer {
   ControllerIO Controller = new JoystickIO(0);//XboxControllerIO(0);
@@ -39,6 +43,7 @@ public class RobotContainer {
   FuelControl fuelCrtl;
   ClimbIO climb;
   GyroIO gyro;
+  VisionIO vision;
 
   public RobotContainer() {
     NerdLog.startLog();
@@ -50,6 +55,7 @@ public class RobotContainer {
         modules[i] = new Module(i, RobotMap.SwerveTurnMotors[i], RobotMap.SwerveDriveMotors[i]);
       }
       this.gyro = new Pidgeon2IO();
+      this.vision = new Vision(new PhotonCamera[] {RobotMap.c270Cam, RobotMap.nexigoCam}, RobotMap.robotToCameras, swerve);
     }
     else {
       for (int i = 0; i<=3; i++) {
@@ -57,12 +63,13 @@ public class RobotContainer {
       }
       if (modules[0].getSwerveSim().isPresent()) this.gyro = new GyroSim(modules[0].getSwerveSim().get().getGyroSimulation());
       else this.gyro = new GyroSim();
+      this.vision = new VisionIO() {};
     }
     
     swerve = new Drive(gyro, modules);
     fuelCrtl = new FuelControl(RobotMap.shooterMotor, RobotMap.hopperMotor);
     climb = new Climb(RobotMap.climbMotor);
-
+    AutoPicker.supplySubSystems(swerve, fuelCrtl,climb, vision, RobotMap.robotToCameras);
   }
 
   
@@ -71,6 +78,7 @@ public class RobotContainer {
     swerve.periodic();
     fuelCrtl.periodic();
     climb.periodic();
+    vision.periodic();
   }
 
   public void enabled() {

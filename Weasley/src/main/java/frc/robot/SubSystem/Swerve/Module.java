@@ -82,7 +82,7 @@ public class Module extends ModuleMotorConfig implements ModuleIO {
     }
     @Override
     public void setDesiredSwerveState(SwerveModuleState desiredState) {
-        desiredState.optimize(new Rotation2d(currentSwerveState.angle.getRadians()));// ensures the turning setpoint takes the most effecient route
+        //desiredState.optimize(new Rotation2d(currentSwerveState.angle.getRadians()));// ensures the turning setpoint takes the most effecient route
         desiredState.cosineScale(new Rotation2d(currentSwerveState.angle.getRadians()));// prevents undesired rotation or translation
         this.desiredState = desiredState;
 
@@ -93,7 +93,7 @@ public class Module extends ModuleMotorConfig implements ModuleIO {
           
         //Driving
             //manual cosine scaling because the abs encoder doesnt want to work for the scaling:
-            //desiredState.speedMetersPerSecond *= Math.cos(turnPID.getError()); 
+            desiredState.speedMetersPerSecond *= Math.cos(turnPID.getError()); 
       
             driveMotor.setVoltage(-desiredState.speedMetersPerSecond*5); // was *5
         

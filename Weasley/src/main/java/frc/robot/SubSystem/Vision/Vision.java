@@ -19,6 +19,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.SubSystem.Logging.NerdLog;
 import frc.robot.SubSystem.Swerve.Drive;
 
 public class Vision implements VisionIO{
@@ -98,7 +99,10 @@ public class Vision implements VisionIO{
                 //must be in the field:
             if (EstimatedPoses[i].get().estimatedPose.getY() < 0 && EstimatedPoses[i].get().estimatedPose.getY() > 8.07) keepPose = false;
 
-            if (keepPose) drive.addvision(EstimatedPoses[i].get().estimatedPose.toPose2d(), latestResults[i].getTimestampSeconds()); // can also use Timer.getFPGATimestamp() if current doesn't work
+            if (keepPose) {
+                NerdLog.logStructvariable("VisionPoses",EstimatedPoses[i].get().estimatedPose.toPose2d(), Pose2d.struct);
+                drive.addvision(EstimatedPoses[i].get().estimatedPose.toPose2d(), latestResults[i].getTimestampSeconds()); // can also use Timer.getFPGATimestamp() if current doesn't work
+            }
         }
     }
 
