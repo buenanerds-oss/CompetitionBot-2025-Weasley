@@ -68,12 +68,12 @@ public class JoystickIO implements ControllerIO{
 
     @Override
     public double getDriveX() {
-        return -MathUtil.applyDeadband(-joystick.getY(), 0.1);
+        return -MathUtil.applyDeadband(joystick.getY(), 0.1);
     }
 
     @Override
     public double getDriveY() {
-        return - MathUtil.applyDeadband(-joystick.getX(), 0.1);
+        return - MathUtil.applyDeadband(joystick.getX(), 0.1);
     }
 
     @Override
