@@ -29,6 +29,7 @@ import frc.robot.SubSystem.Swerve.Drive;
 import frc.robot.SubSystem.Swerve.SwerveConstants;
 import frc.robot.SubSystem.Vision.Vision;
 import frc.robot.SubSystem.Vision.VisionIO;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;;
 
 public class AutoPicker {
@@ -71,10 +72,17 @@ public class AutoPicker {
                     fuelCrtl.shootShooter();
                     fuelCrtl.outtake();
                 }
-                while (climb.atLimit(false)) climb.climbDown();
+                shootTimer.stop();
+                Timer climbOutTimer = new Timer();
+                climbOutTimer.start();
+                while (!climbOutTimer.hasElapsed(2)) climb.climbDown();
+                climbOutTimer.stop();
                 // distance from wall to hub - (distance from wall to tower  + (robtolength - camera distance from front))
-                driveBackToTower(Units.inchesToMeters(158.6) - (Units.inchesToMeters(45) + (SwerveConstants.driveLength - Units.inchesToMeters(0.25))));
-                while (climb.atLimit(true)) climb.climbUp();
+                driveBackToTower(Units.inchesToMeters(158.6) - 0);
+                Timer climbUpTimer = new Timer();
+                climbUpTimer.start();
+                while (!climbUpTimer.hasElapsed(5) && DriverStation.isAutonomousEnabled()) climb.climbUp();
+                climbUpTimer.stop();
                 break;
             case SHOOT_BALLS_AND_COLLECT_DEPOSITE: break;
             case SHOOT_BALLS_AND_GO_MIDDLE: break;
