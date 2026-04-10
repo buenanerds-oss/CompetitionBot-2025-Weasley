@@ -15,5 +15,4 @@ public class DriverCam {
         Cam.setResolution(ResloutionWidth, ResolutionHeight); //TODO configure resolution
         Cam.setFPS(FPS); //todo configure FPS
     }
-
 }

@@ -77,8 +77,8 @@ public class RobotContainer {
     if (Robot.isReal()) this.vision = new Vision(new PhotonCamera[] {RobotMap.c270Cam, RobotMap.nexigoCam}, RobotMap.robotToCameras, swerve);
     aiming = new AimAssist(vision, RobotMap.cameraDegreesFront);
     
-    AutoPicker.supplySubSystems(swerve, fuelCrtl,climb, vision, RobotMap.robotToCameras);
-    driveCam = new DriverCam(1920, 720, 30);
+    AutoPicker.supplySubSystems(swerve, fuelCrtl ,climb, vision, RobotMap.robotToCameras);
+    //driveCam = new DriverCam(1920, 720, 30);
   }
 
   

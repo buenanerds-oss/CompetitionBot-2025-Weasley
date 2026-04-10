@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.AnalogEncoder;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotState;
 import frc.robot.RobotMap;
 import frc.robot.SubSystem.Logging.GroupLogger;
@@ -55,8 +56,10 @@ public class Module extends ModuleMotorConfig implements ModuleIO {
 
 
         //from the ModuleMotorConfig Class
+        if (!DriverStation.isEnabled()) {
         configureTurnMotor(turnMotor);
         configureDriveMotor(driveMotor);
+        }
 
         this.turnSparkPID = turnMotor.getClosedLoopController();
         this.driveSparkPID = driveMotor.getClosedLoopController();
@@ -82,7 +85,7 @@ public class Module extends ModuleMotorConfig implements ModuleIO {
     }
     @Override
     public void setDesiredSwerveState(SwerveModuleState desiredState) {
-        //desiredState.optimize(new Rotation2d(currentSwerveState.angle.getRadians()));// ensures the turning setpoint takes the most effecient route
+        desiredState.optimize(new Rotation2d(currentSwerveState.angle.getRadians()));// ensures the turning setpoint takes the most effecient route
         desiredState.cosineScale(new Rotation2d(currentSwerveState.angle.getRadians()));// prevents undesired rotation or translation
         this.desiredState = desiredState;
 
@@ -93,7 +96,7 @@ public class Module extends ModuleMotorConfig implements ModuleIO {
           
         //Driving
             //manual cosine scaling because the abs encoder doesnt want to work for the scaling:
-            desiredState.speedMetersPerSecond *= Math.cos(turnPID.getError()); 
+            //desiredState.speedMetersPerSecond *= Math.cos(turnPID.getError()); 
       
             driveMotor.setVoltage(-desiredState.speedMetersPerSecond*8); // was *5
         

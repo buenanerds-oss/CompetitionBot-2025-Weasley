@@ -20,7 +20,7 @@ public class Shooter implements ShooterIO {
     ShuffleboardTab shuffleTab;
     double targetSpeedRadPerSec = 400;
     double RequestedVolts = 8.45;
-    double CrtlTolerance = 20;
+    double CrtlTolerance = 50;
 
 
     //logging:

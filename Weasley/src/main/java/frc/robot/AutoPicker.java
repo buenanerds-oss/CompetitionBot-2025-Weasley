@@ -54,7 +54,12 @@ public class AutoPicker {
      * @param climb
      * @param vision
      */
-    public static void supplySubSystems(Drive drive, FuelControl fuelCrtl, ClimbIO climb, VisionIO vision, Transform3d[] robotToCamera) {
+    public static void supplySubSystems(Drive subdrive, FuelControl subfuelCrtl, ClimbIO subclimb, VisionIO subvision, Transform3d[] subrobotToCamera) {
+        drive  = subdrive;
+        fuelCrtl = subfuelCrtl;
+        climb = subclimb;
+        vision = subvision;
+        robotToCamera = subrobotToCamera;   
     }
 
     public static enum AutoRoutines {
@@ -62,26 +67,34 @@ public class AutoPicker {
     }
 
     public static void pickAuto(AutoRoutines routine) {
+        if (drive == null ||
+        fuelCrtl == null ||
+        climb == null ||
+        vision == null ||
+        robotToCamera == null ||
+        routine == null) return;
         switch (routine) {
             case SHOOT_BALLS: ShootBalls(); break;
             case CLIMB: findClimbRack(); Climb(); break;
             case SHOOT_BALLS_AND_CLIMB:
+                drive.zeroOutModules();
+                Timer backUp = new Timer();
+                backUp.start();
+                while (!backUp.hasElapsed(1.25)) drive.move(-0.25, 0, 0);
+                backUp.stop();
                 Timer shootTimer = new Timer();
                 shootTimer.start();
                 while (!shootTimer.hasElapsed(8)) {
                     fuelCrtl.shootShooter();
                     fuelCrtl.outtake();
+                    climb.climbDown();
                 }
                 shootTimer.stop();
-                Timer climbOutTimer = new Timer();
-                climbOutTimer.start();
-                while (!climbOutTimer.hasElapsed(2)) climb.climbDown();
-                climbOutTimer.stop();
                 // distance from wall to hub - (distance from wall to tower  + (robtolength - camera distance from front))
-                driveBackToTower(Units.inchesToMeters(158.6) - 0);
+                driveBackToTower(-Units.inchesToMeters(120.75) - Units.inchesToMeters(19.5));
                 Timer climbUpTimer = new Timer();
                 climbUpTimer.start();
-                while (!climbUpTimer.hasElapsed(5) && DriverStation.isAutonomousEnabled()) climb.climbUp();
+                while (!climbUpTimer.hasElapsed(8) && DriverStation.isAutonomousEnabled()) climb.climbUp();
                 climbUpTimer.stop();
                 break;
             case SHOOT_BALLS_AND_COLLECT_DEPOSITE: break;
@@ -114,7 +127,7 @@ public class AutoPicker {
             }
 
             //set drive proportional to the distance from the hub:
-            double driveX = -distanceFromHubMeters/Units.inchesToMeters(158.6); //scaled with the distance from hub to the wall
+            double driveX = -distanceFromHubMeters/Units.inchesToMeters(130); //scaled with the distance from hub to the wall
             drive.move(driveX, 0, 0);
         }
     }

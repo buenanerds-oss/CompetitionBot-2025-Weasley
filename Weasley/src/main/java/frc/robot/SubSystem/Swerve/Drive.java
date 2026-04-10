@@ -69,6 +69,10 @@ public class Drive implements Subsystem {
         for (ModuleIO module : modules) module.periodic();
     }
 
+    public void zeroOutModules() {
+        for (ModuleIO module: modules) module.setDesiredSwerveState(new SwerveModuleState());
+    }
+
     public Pose2d getEstimatedPose() {
         return poseEstimator.getEstimatedPosition();
     }
