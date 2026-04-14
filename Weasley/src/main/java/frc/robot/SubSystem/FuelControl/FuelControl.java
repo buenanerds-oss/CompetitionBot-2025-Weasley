@@ -85,7 +85,7 @@ public class FuelControl{
         shooter.periodic();
         hopper.periodic();
 
-         if (hopperOutTimer.hasElapsed(5)) { // 3 is arbitrary, but i doubt we'd run either of the hopper out times for more than 2 secs
+         if (hopperOutTimer.hasElapsed(5)) { // 5 is arbitrary, but i doubt we'd run either of the hopper out times for more than 2 secs
             hopperOutTimer.stop();
             hopperOutTimer.reset();
         }

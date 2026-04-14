@@ -180,6 +180,7 @@ public class AutoPicker {
         PhotonCamera intakeCam = RobotMap.Intakecam;
         PhotonTrackedTarget climbTarget = null;
         double distanceFromHubMeters = 0;
+        double driveY = 0.00;
         while (distanceFromHubMeters < desiredDistanceFromHubMeters) {
 
             //get reccomened heading from intake cam: 11 in from front
@@ -189,7 +190,7 @@ public class AutoPicker {
             PhotonPipelineResult latestResult = allresults.get(allresults.size()-1);
             for (PhotonTrackedTarget target : latestResult.getTargets()) {
                 if ((target.getFiducialId() == 16 || target.getFiducialId() == 32) && target.getPoseAmbiguity() < 0.3) {
-                    reccomendedHeading = Units.degreesToRadians(target.getYaw() - 5.00);
+                    reccomendedHeading = Units.degreesToRadians(target.getYaw() - 5.00 ); // only use heading for the proper tag
                     climbTarget = target;
                 }
             }
@@ -212,6 +213,8 @@ public class AutoPicker {
                           robotToCamera[i].getRotation().getY(),
                           target.getPitch());
                     else if (climbTarget.getPoseAmbiguity()  < 0.35) { // i want this to be slightly more tolerable than normal
+                      
+
                         distanceFromHubMeters = Units.inchesToMeters(158.6) - PhotonUtils.calculateDistanceToTargetMeters(
                                                  Units.inchesToMeters(21.5),
                                                  Units.inchesToMeters(21.75),
@@ -223,7 +226,7 @@ public class AutoPicker {
 
             //set drive proportional to the distance from the hub:
             double driveX = -(125 -distanceFromHubMeters)/Units.inchesToMeters(130); //scaled with the distance from hub to the wall
-            drive.move(driveX, 0, -reccomendedHeading);
+            drive.move(driveX, driveY, -reccomendedHeading);
         }
     }
 

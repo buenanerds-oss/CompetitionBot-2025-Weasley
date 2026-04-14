@@ -30,7 +30,7 @@ public class Shooter implements ShooterIO {
     double velocityRadPerSec;
 
     //functionals:
-    PIDController pidCrtl = new PIDController(0.5, 0, 0);
+    PIDController pidCrtl = new PIDController(0.5, 0, 0); // did not use, but still theire for alternative
     BangBangController bangCrtl;
     SparkMax motor;
     RelativeEncoder encoder;
@@ -66,7 +66,7 @@ public class Shooter implements ShooterIO {
             NerdLog.logDouble("Fuel Control/Shooter/planned Output", 8.45 * bangCrtl.calculate(velocityRadPerSec));
             //bang bang control:
             bangCrtl.setSetpoint(targetSpeedRadPerSec);
-            motor.setVoltage(8.45 * bangCrtl.calculate(velocityRadPerSec));
+            motor.setVoltage(RequestedVolts * bangCrtl.calculate(velocityRadPerSec));
             NerdLog.logDouble("Fuel Control/Shooter/ bang crtl output", bangCrtl.calculate(velocityRadPerSec));
             
 
@@ -104,12 +104,14 @@ public class Shooter implements ShooterIO {
     @Override
     public boolean isShooting() {
         if (DriverStation.isAutonomous()) {
+            RequestedVolts = 9.5;
            autoTime.start();
-           if (autoTime.hasElapsed(2)) {
+           if (autoTime.hasElapsed(5)) {
             autoTime.stop();
             return true;
            }
         }
+        RequestedVolts = 8.45;
         return bangCrtl.atSetpoint();//velocityRadPerSec > targetSpeedRadPerSec - bangCrtlTolerance;//bangCrtl.atSetpoint();//Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
     }
 
@@ -124,7 +126,7 @@ public class Shooter implements ShooterIO {
         NerdLog.logDouble("Fuel Control//Shooter/ bus voltage", motor.getBusVoltage());
 
 
-        RequestedVolts = NerdLog.getdouble("Fuel Control/Shooter/ requestedVolts");
+        //RequestedVolts = NerdLog.getdouble("Fuel Control/Shooter/ requestedVolts");
        targetSpeedRadPerSec= NerdLog.getdouble("Fuel Control/Shooter/ target Speed Rad Per Sec");
         CrtlTolerance = NerdLog.getdouble("Fuel Control/Shooter/ control Tolerance");
         /*
